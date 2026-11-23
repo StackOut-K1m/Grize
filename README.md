@@ -6,7 +6,7 @@
 
 브라우저에서 바로 하는 횡스크롤 액션 로그라이트
 
-[플레이 (itch.io)](https://jkhm.itch.io/grize) · [게임 소개](docs/game/concept.md) · [기술 구조](docs/tech/architecture.md) · [담당 업무](docs/my-role.md) · [English summary](#english-summary)
+[플레이 (itch.io)](https://jkhm.itch.io/grize) · [웹 페이지](https://stackout-k1m.github.io/Grize/) · [게임 소개](docs/game/concept.md) · [기술 구조](docs/tech/architecture.md) · [담당 업무](docs/my-role.md) · [English summary](#english-summary)
 
 </div>
 
@@ -106,7 +106,7 @@ flowchart LR
 
 이 저장소에는 게임을 소개하는 문서와 그림, 영상만 있고 게임 소스 코드는 없습니다. 그림과 영상의 저작권은 팀에 있습니다.
 
-같은 내용을 웹 페이지로도 정리했습니다: [소개](index.html), [게임](game.html), [기술](tech.html). 저장소를 공개하고 GitHub Pages 를 켜면 바로 열립니다.
+같은 내용을 웹 페이지로도 정리했습니다: [소개](https://stackout-k1m.github.io/Grize/), [게임](https://stackout-k1m.github.io/Grize/game.html), [기술](https://stackout-k1m.github.io/Grize/tech.html).
 
 ---
 
