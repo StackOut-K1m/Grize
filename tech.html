@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grize 기술 구조</title>
+<meta name="description" content="Grize 의 서비스 구조, 서버 권위 원정과 기록 위조 대응, 실시간 동기화, 인프라와 배포, 성능 개선">
+<link rel="stylesheet" href="site/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">GRIZE</a>
+    <nav class="nav">
+      <a href="index.html">소개</a>
+      <a href="game.html">게임</a>
+      <a href="tech.html" aria-current="page">기술</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero-sub">
+  <div class="wrap">
+    <p class="eyebrow">BACKEND · INFRA</p>
+    <h1>기술 구조</h1>
+    <p class="lead">브라우저 게임 클라이언트와 공용 콘텐츠 데이터, Spring Boot API 가 어떻게 이어지는지, 싱글 원정을 서버가 어떻게 검증하는지, 서버 한 대에서 운영과 개발 환경을 어떻게 나눠 배포했는지 정리했습니다.</p>
+    <dl class="facts" style="margin-top:20px">
+      <dt>클라이언트</dt><dd>TypeScript, Phaser 3, React, zustand, Vite</dd>
+      <dt>서버</dt><dd>Java 21, Spring Boot 3, JdbcTemplate, Flyway, WebSocket, MySQL 8</dd>
+      <dt>인프라</dt><dd>Docker Compose, nginx, Let's Encrypt, Jenkins, Prometheus, Grafana, Loki</dd>
+    </dl>
+  </div>
+</div>
+
+<section class="section-alt" id="arch">
+  <div class="wrap">
+    <p class="eyebrow">ARCHITECTURE</p>
+    <h2>서비스 구성</h2>
+    <p>구성 요소를 누르면 설명이 바뀝니다. <span class="chip">담당</span> 표시는 제가 맡았거나 일부를 맡은 부분입니다.</p>
+    <div class="arch">
+      <div class="arch-map">
+        <div class="arch-tier"><div class="t">브라우저</div><div class="arch-row">
+          <button class="node" data-k="react">React</button>
+          <button class="node" data-k="zustand">zustand</button>
+          <button class="node" data-k="phaser">Phaser 3</button>
+        </div></div>
+        <div class="arch-tier"><div class="t">클라이언트와 서버가 함께 읽는 데이터</div><div class="arch-row">
+          <button class="node" data-k="shared">shared</button>
+        </div></div>
+        <div class="arch-tier"><div class="t">서버 (운영, 개발 환경이 각각 따로)</div><div class="arch-row">
+          <button class="node mine" data-k="nginx">edge nginx</button>
+          <button class="node" data-k="client">client</button>
+          <button class="node mine" data-k="api">Spring Boot API</button>
+          <button class="node mine" data-k="mysql">MySQL</button>
+        </div></div>
+        <div class="arch-tier"><div class="t">운영 도구 (두 환경이 같이 씀)</div><div class="arch-row">
+          <button class="node mine" data-k="jenkins">Jenkins</button>
+          <button class="node mine" data-k="monitor">모니터링</button>
+          <button class="node mine" data-k="backup">DB 백업</button>
+        </div></div>
+      </div>
+      <div class="arch-detail" id="arch-detail" aria-live="polite"></div>
+    </div>
+    <div class="media-wide" style="margin-top:24px"><img src="media/slides/architecture.jpg" alt="전체 아키텍처 그림"></div>
+  </div>
+</section>
+
+<section id="run">
+  <div class="wrap">
+    <p class="eyebrow">SERVER AUTHORITY</p>
+    <h2>싱글 원정을 서버가 검증하는 방식</h2>
+    <p>원정은 싱글플레이 모드지만 랭킹과 영구 재화가 걸려 있습니다. 클라이언트가 보낸 결과를 그대로 저장하면 기록 조작이 다른 플레이어에게 피해가 될 수 있어서, 판정에 필요한 정보는 서버가 갖도록 설계했습니다. 원정 저장 구조와 API 명세, 서버 쪽 첫 구현(체크포인트, 정산)을 제가 맡았습니다.</p>
+    <div class="stepper">
+      <ol class="steps" id="run-steps">
+        <li><span class="n">1</span><div><b>원정 시작 (POST /runs)</b><br>클라이언트가 콘텐츠 해시를 보내면 서버가 판을 확인하고, 시드로 원정 계획(방 구성, 몹, 드랍, 보스, 상점)을 만들어 저장합니다. 계획은 클라이언트에 보내지 않습니다.</div></li>
+        <li><span class="n">2</span><div><b>지금 방 정보만 전달</b><br>클라이언트는 지금 방의 몹과 드랍, 쓰기 세션 id 만 받습니다. 방 안에서 싸우는 동안에는 서버와 통신하지 않습니다.</div></li>
+        <li><span class="n">3</span><div><b>방 클리어 보고</b><br>쓰러뜨린 몹, 주운 드랍, 남은 체력을 보냅니다. 요청에는 멱등 키, 쓰기 세션, 예상 revision 이 함께 실립니다.</div></li>
+        <li><span class="n">4</span><div><b>서버 검사</b><br>더미 몹이 섞였는지, 처치 목록이 계획과 같은지, 입장 후 서버 시계로 2초가 지났는지, 드랍이 계획 안에 있는지 확인합니다.</div></li>
+        <li><span class="n">5</span><div><b>보상 계산과 저장</b><br>조각, 골드, SP 는 클라이언트 값이 아니라 계획값으로 서버가 계산하고 revision 을 올려 저장합니다. 같은 요청이 다시 오면 저장해 둔 응답을 돌려줍니다.</div></li>
+        <li><span class="n">6</span><div><b>다음 방 이동</b><br>클라이언트가 고른 방이 계획상 갈 수 있는 방인지 확인하고 다음 방 정보를 내려줍니다.</div></li>
+        <li><span class="n">7</span><div><b>종료와 정산</b><br>클리어, 퇴각, 사망 중 하나로 끝나면 그림자 조각을 영구 재화로 바꾸고, 흡수한 보스 그림자를 해금하고, 재화 변동을 원장에 기록합니다.</div></li>
+      </ol>
+      <div class="step-ctl"><button type="button" id="step-prev">이전 단계</button><button type="button" id="step-next">다음 단계</button></div>
+    </div>
+
+    <div class="table-wrap" style="margin-top:24px">
+      <table>
+        <thead><tr><th>상황</th><th>서버의 처리</th></tr></thead>
+        <tbody>
+          <tr><td>같은 요청이 두 번 옴</td><td>멱등 키로 저장해 둔 응답을 그대로 돌려줌</td></tr>
+          <tr><td>두 기기에서 동시에 저장</td><td>예상 revision 비교, 쓰기 세션, 행 잠금으로 하나만 반영. 다른 기기에서 이어 하면 이전 기기는 쓰기 권한을 잃음</td></tr>
+          <tr><td>랭킹 시간</td><td>서버 시계로 잼. 클라이언트는 일시정지와 재개 신호만 보내고 시각은 서버가 기록</td></tr>
+          <tr><td>오래된 클라이언트</td><td>규약 버전 헤더가 낮으면 426 응답으로 새로고침 안내</td></tr>
+          <tr><td>콘텐츠 판이 다름</td><td>새 원정을 막고, 진행 중인 원정은 새 판으로 옮길 수 있게 함</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section-alt" id="security">
+  <div class="wrap">
+    <p class="eyebrow">SECURITY</p>
+    <h2>기록 위조 문제와 대응</h2>
+    <p>1차, 2차 대응과 허니팟, 이상 기록 탐지는 팀원과 협업했고, 그 바탕인 원정 저장 구조(계획 비공개, 체크포인트, 정산, 멱등 저장)는 제가 설계하고 구현했습니다.</p>
+    <div class="timeline">
+      <div class="tl"><div class="when">문제</div><div>
+        <p>1챕터 평균 클리어 시간은 9분 57초였는데 랭킹 1위는 4초로 집계된 사례가 있었습니다. 초기 서버는 클라이언트의 클리어 보고를 그대로 받아들였기 때문에, 싸우지 않고 클리어 요청만 연달아 보내도 다음 방으로 넘어갔습니다.</p>
+        <img src="media/slides/security-record.jpg" alt="평균 9분 57초와 1위 4초 비교" style="border-radius:10px">
+      </div></div>
+      <div class="tl"><div class="when">1차 대응</div><div>
+        <p>처치 목록을 서버의 원정 계획과 대조하고, 방에 들어간 뒤 서버 시계로 최소 2초가 지나야 클리어를 받게 하고, 방마다 더미 몹을 하나씩 섞었습니다.</p>
+        <img src="media/slides/security-1st.jpg" alt="1차 대응" style="border-radius:10px">
+      </div></div>
+      <div class="tl"><div class="when">허니팟</div><div>
+        <p>첫 더미는 항상 같은 몹이라 콘솔에서 바로 걸러졌습니다. 이후 더미를 맵이 아닌 몹 목록에만 넣고, 다른 방의 진짜 몹 종류와 자리 이름, 드랍을 빌려 와 구별하기 어렵게 했습니다. 요청에 더미의 id 가 들어오면 그 원정은 무효가 되고, 계정과 방, 건드린 대상이 기록됩니다.</p>
+        <img src="media/slides/honeypot.jpg" alt="허니팟 몹" style="border-radius:10px">
+      </div></div>
+      <div class="tl"><div class="when">2차 대응</div><div>
+        <p>속도를 2배로 올리거나 피해를 10배로 키우는 조작은 결과만 봐서는 알 수 없습니다. 방마다 남긴 전투 기록에서 특징 10개(시간, 피해, 처치)를 뽑아 k-NN 거리로 이상 점수를 매기고, 점수가 높은 기록은 GM 이 직접 보고 판정했습니다. 조작 라벨이 없어 비지도 방식을 썼고, 속도 2배 조작을 정상 기록 1% 만 검토하는 조건에서 k-NN 은 93% 를 찾았습니다 (Isolation Forest 2%).</p>
+        <img src="media/slides/security-2nd.jpg" alt="2차 대응 흐름" style="border-radius:10px">
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section id="realtime">
+  <div class="wrap">
+    <p class="eyebrow">REALTIME</p>
+    <h2>콘텐츠별 실시간 동기화</h2>
+    <p>멀티 콘텐츠는 API 서버 안의 WebSocket 연결 하나에 방 종류를 나눠 올렸고, 공정성이 얼마나 중요한지에 따라 방식을 골랐습니다. 실시간 서버는 주로 팀원이 구현했고, 저는 인증과 배포, nginx 의 WebSocket 경로를 맡았습니다.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>콘텐츠</th><th>방식</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>광장</td><td>중계</td><td>서버가 초당 15회 모아 바뀐 것만 다시 보내고, 받는 쪽은 120ms 전 시점으로 보간</td></tr>
+          <tr><td>PvP</td><td>서버 권위</td><td>초당 50회. 이동, 평타, 피격, 체력을 서버가 계산하고 스킬 명중 보고도 다시 판단</td></tr>
+          <tr><td>협동 생존</td><td>호스트 권위</td><td>같은 편끼리라 방장 브라우저가 몹을 계산하고 서버는 중계</td></tr>
+          <tr><td>라인 전쟁</td><td>락스텝</td><td>초당 20틱, 명령은 3틱 뒤 실행, 양쪽 상태 해시만 비교</td></tr>
+          <tr><td>그몽어스</td><td>서버 권위</td><td>초당 10회, 서버가 게임 상태를 계산</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:14px">입장은 30초짜리 1회용 입장권으로 하고, 연결마다 보내기 큐와 받기 제한(초당 100개)을 두었습니다. 15초 동안 아무것도 오지 않으면 연결을 정리합니다.</p>
+  </div>
+</section>
+
+<section class="section-alt" id="infra">
+  <div class="wrap">
+    <p class="eyebrow">INFRA</p>
+    <h2>서버 한 대에서 운영과 개발 환경 나누기</h2>
+    <p>아무것도 설치되지 않은 서버에 Docker 를 까는 것부터 compose 설정, nginx, HTTPS, 도메인, Jenkins 자동 배포, 운영과 개발 환경 분리, DB 백업까지 제가 설계하고 구축했고, 운영 기간 동안 서버 관리도 맡았습니다.</p>
+
+    <div class="grid g2" style="margin-top:8px">
+      <div class="card">
+        <h3>환경 분리</h3>
+        <ul class="plain">
+          <li>운영(www)은 main, 개발(dev)은 develop 을 띄우고 주소마다 client, API, DB 를 따로 둠</li>
+          <li>경로가 아니라 하위 도메인으로 나눔. 로그인 쿠키와 브라우저 저장소, Google 로그인 허용 출처가 주소 단위라서</li>
+          <li>edge nginx 를 앱 묶음과 분리해 개발 환경을 내려도 운영은 영향 없음</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>외부 노출</h3>
+        <ul class="plain">
+          <li>Docker 가 연 포트는 서버 방화벽을 거치지 않아서 compose 의 ports 를 공개 목록으로 관리</li>
+          <li>외부 포트는 80, 443 뿐이고 API, DB, Jenkins, Grafana 는 127.0.0.1 에만</li>
+          <li>필수 비밀값이 비면 컨테이너가 시작되지 않게 하고, 메모리 상한과 자동 재시작 설정</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px">배포 파이프라인</h3>
+    <p>develop 병합은 GitLab 웹훅으로 개발 서버에 자동 배포하고, 운영은 담당자가 Jenkins 에서 직접 실행합니다. 학교 GitLab 은 저장소가 옮겨질 수 있어서 Git 호스트 전용 기능 대신 Jenkins 를 골랐고, 절차는 deploy.sh 한 파일에 모았습니다.</p>
+    <div class="pipe">
+      <div class="p"><b>Sync</b>fast-forward 만</div><span class="arrow">→</span>
+      <div class="p"><b>Build</b>이미지, 되돌리기 태그</div><span class="arrow">→</span>
+      <div class="p"><b>API 교체</b>Flyway, healthy 대기</div><span class="arrow">→</span>
+      <div class="p"><b>Client 교체</b></div><span class="arrow">→</span>
+      <div class="p"><b>Smoke 검사</b>200, 401, 콘텐츠 해시</div><span class="arrow">→</span>
+      <div class="p"><b>정리</b>이미지 5개, 캐시 20GB</div>
+    </div>
+    <p class="note" style="margin-top:12px">운영 41회, 개발 470회 넘게 배포했습니다. 무중단 배포가 아니어서 API 교체 때 약 15초 동안 요청이 실패했고, 이 정도는 감수하기로 했습니다.</p>
+
+    <h3 style="margin-top:32px">운영 중 생긴 문제</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>문제</th><th>원인</th><th>조치</th></tr></thead>
+        <tbody>
+          <tr><td>배포가 커밋 목록 출력에서 멈춤</td><td><code>git log | head</code> 가 SIGPIPE 로 끝나며 pipefail 에 걸림</td><td><code>git log -n 20</code> 으로 변경</td></tr>
+          <tr><td>웹훅 테스트 한 번에 되돌릴 이미지를 잃음</td><td>같은 커밋을 다시 빌드할 때도 rollback 태그를 옮김</td><td>같은 커밋이면 태그 유지</td></tr>
+          <tr><td>빌드 캐시가 104GB 까지 쌓임</td><td>정리 단계가 없었음</td><td>배포 끝에 캐시 20GB 상한 정리</td></tr>
+          <tr><td>웹훅이 갑자기 404</td><td>GitLab 이 웹훅 주소를 바꾸며 비밀 토큰을 비움</td><td>토큰 재설정, 점검 절차 문서화</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:32px">아쉬운 점</h3>
+    <ul class="plain">
+      <li>서버 한 대에 모든 것을 두었고 백업도 같은 디스크에 있었습니다. 백업은 서버 밖에 두었어야 합니다.</li>
+      <li>무중단 배포가 아니었습니다. API 를 두 벌 띄워 바꾸는 블루그린 방식으로 개선할 수 있습니다.</li>
+      <li>알림 규칙은 있었지만 받을 곳을 연결하지 못해 장애를 대시보드에서 직접 찾아야 했습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="perf">
+  <div class="wrap">
+    <p class="eyebrow">PERFORMANCE</p>
+    <h2>팀이 해결한 성능 문제</h2>
+    <p>아래 개선은 팀원들의 작업입니다.</p>
+    <div class="bars" style="margin-top:12px">
+      <div class="bar-row"><div class="label"><span>챕터 입장 시간 (무손실 WebP, 그림 묶음 나누기)</span><b>25초 → 8초</b></div>
+        <div class="bar"><span class="before" style="width:100%">25초</span><span class="after" style="width:32%">8초</span></div></div>
+      <div class="bar-row"><div class="label"><span>광장 입장 시간</span><b>6초 → 2초</b></div>
+        <div class="bar"><span class="before" style="width:100%">6초</span><span class="after" style="width:33%">2초</span></div></div>
+      <div class="bar-row"><div class="label"><span>원정 그림 용량</span><b>246MB → 116MB</b></div>
+        <div class="bar"><span class="before" style="width:100%">246MB</span><span class="after" style="width:47%">116MB</span></div></div>
+      <div class="bar-row"><div class="label"><span>PvP 상대 표시 지연 (전송 빈도, 보간 조정)</span><b>약 250ms → 115ms</b></div>
+        <div class="bar"><span class="before" style="width:100%">250ms</span><span class="after" style="width:46%">115ms</span></div></div>
+      <div class="bar-row"><div class="label"><span>생존 모드 끊긴 프레임 (몹 약 290마리, 1,200프레임 중)</span><b>435 → 76</b></div>
+        <div class="bar"><span class="before" style="width:100%">435</span><span class="after" style="width:17%">76</span></div></div>
+    </div>
+    <p class="note" style="margin-top:16px">용량과 대기 시간은 다른 지표라 같은 비율로 줄지 않았고, WebP 전환과 묶음 나누기가 각각 얼마나 기여했는지는 따로 측정하지 않았습니다.</p>
+    <div class="btns" style="margin-top:20px">
+      <a class="btn" href="https://github.com/StackOut-K1m/Grize/blob/main/docs/tech/troubleshooting.md">트러블슈팅 문서</a>
+      <a class="btn" href="https://github.com/StackOut-K1m/Grize/blob/main/docs/tech/qna.md">예상 질문과 답</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Grize · SSAFY 15기 자율 프로젝트 C103</p>
+    <p>게임 그림과 영상의 저작권은 팀에 있습니다. 이 페이지에는 게임 소스 코드가 들어 있지 않습니다.</p>
+    <p><a href="https://github.com/StackOut-K1m/Grize">GitHub 저장소</a> · <a href="https://jkhm.itch.io/grize">itch.io</a></p>
+  </div>
+</footer>
+
+<script src="site/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grize</title>
+<meta name="description" content="보스를 쓰러뜨리면 그 보스로 변신해 싸우는 브라우저 횡스크롤 액션 로그라이트 Grize 소개">
+<link rel="stylesheet" href="site/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">GRIZE</a>
+    <nav class="nav">
+      <a href="index.html" aria-current="page">소개</a>
+      <a href="game.html">게임</a>
+      <a href="tech.html">기술</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">SSAFY 15기 자율 프로젝트 · 7인</p>
+    <h1>GRIZE</h1>
+    <p class="tag">브라우저에서 바로 하는 횡스크롤 액션 로그라이트</p>
+    <div class="btns">
+      <a class="btn primary" href="https://jkhm.itch.io/grize">itch.io 에서 플레이</a>
+      <a class="btn" href="game.html">게임 살펴보기</a>
+      <a class="btn" href="tech.html">기술 구조 보기</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" style="padding-top:8px">
+  <p class="banner">운영 서버(www.grize.site)는 2026년 11월 27일에 내려갑니다. itch.io 판은 서버 없이 브라우저에서만 돌아가는 싱글 판이라 그 뒤에도 플레이할 수 있고, 진행 기록은 브라우저에 저장됩니다.</p>
+</div>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">ABOUT</p>
+    <h2>보스를 쓰러뜨리면 그 보스로 싸웁니다</h2>
+    <p class="lead">보스를 처치하면 그 보스의 그림자를 흡수하고, 이후에는 그 보스로 변신(의태)해 같은 기술을 쓸 수 있습니다. 강한 적의 기술을 직접 써 보고 싶다는 생각에서 출발한 규칙이고, 세계관도 이 규칙에 맞춰 만들었습니다.</p>
+    <div class="media-wide"><img class="pixel" src="media/gif/mimic.gif" alt="흡수한 보스로 의태해 싸우는 장면"></div>
+    <div class="grid g3">
+      <figure class="shot"><img src="media/screenshots/14-boss-grash.jpg" alt="보스전"><figcaption>보스전</figcaption></figure>
+      <figure class="shot"><img src="media/screenshots/15-absorb.jpg" alt="그림자 흡수"><figcaption>그림자 흡수</figcaption></figure>
+      <figure class="shot"><img src="media/screenshots/18-mimic-skill.jpg" alt="의태 후 보스 기술"><figcaption>의태한 뒤 보스 기술 사용</figcaption></figure>
+    </div>
+    <p style="margin-top:24px">원정은 광장에서 출발해 방을 하나씩 지나며 보스를 잡는 구조입니다. 3챕터까지 공개했고 보스 16명, 유물 140개(시너지 10종)가 있습니다. 운영하면서 족쇄의 원정, 인내의 탑, 심연의 탑, PvP, 그몽어스, 생존 모드, 라인 전쟁을 차례로 추가했습니다.</p>
+  </div>
+</section>
+
+<section class="section-alt">
+  <div class="wrap">
+    <p class="eyebrow">LIVE SERVICE</p>
+    <h2>4주간의 실서비스</h2>
+    <p>2026년 10월 30일에 서비스를 열었습니다. 아래는 11월 22일 18시 5분(KST) 기준 값입니다.</p>
+    <div class="stats">
+      <div class="stat"><div class="v">225<small>시간</small></div><div class="k">누적 플레이 시간 (225시간 8분, 약 9일 9시간)</div></div>
+      <div class="stat"><div class="v">215</div><div class="k">계정</div></div>
+      <div class="stat"><div class="v">1,401</div><div class="k">원정 플레이</div></div>
+      <div class="stat"><div class="v">36<small>/49</small></div><div class="k">반영한 피드백 (업데이트 15회)</div></div>
+    </div>
+    <p class="note" style="margin-top:16px">처음 열었을 때 콘텐츠는 원정 하나였습니다. 원정 말고 즐길 거리를 묻는 의견이 이어져, 원정의 보스와 맵을 다른 모드에서 다시 쓰는 방식으로 서브 콘텐츠를 늘렸습니다.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">MORE</p>
+    <h2>더 보기</h2>
+    <div class="grid g2">
+      <div class="track">
+        <span class="chip">게임 · 기획</span>
+        <h3>게임은 어떻게 만들었나</h3>
+        <ul class="plain">
+          <li>세계관 설정에서 게임 규칙을 끌어낸 과정</li>
+          <li>의태, 로그라이트 구조, 원정과 서브 콘텐츠 7종</li>
+          <li>운영 지표와 피드백 49건을 반영한 과정</li>
+          <li>직접 만든 보스, 광장 배경, NPC</li>
+        </ul>
+        <a class="btn" href="game.html">게임 페이지</a>
+      </div>
+      <div class="track">
+        <span class="chip v">백엔드 · 인프라</span>
+        <h3>서비스는 어떻게 돌아가나</h3>
+        <ul class="plain">
+          <li>클라이언트, 공용 데이터, API 서버 구조</li>
+          <li>싱글 원정을 서버가 검증하는 방식과 기록 위조 대응</li>
+          <li>서버 한 대에 운영과 개발 환경을 나눈 배포 구조</li>
+          <li>로딩 25초를 8초로 줄인 일 등 성능 개선</li>
+        </ul>
+        <a class="btn" href="tech.html">기술 페이지</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-alt">
+  <div class="wrap">
+    <p class="eyebrow">MY ROLE</p>
+    <h2>담당 업무</h2>
+    <div class="grid g2">
+      <div>
+        <p>인프라와 백엔드를 맡았고, 후반에는 일부 에셋을 만들었습니다.</p>
+        <ul class="plain">
+          <li>DB 스키마와 ERD, API 공통 규약과 원정 API 명세 작성</li>
+          <li>이메일·Google 로그인과 JWT 인증, Flyway 스키마, 서버 쪽 원정 저장(체크포인트, 정산) 첫 구현</li>
+          <li>클라이언트 원정 진행을 서버 저장에 연결 (상점, 유물, 의태 획득, 갈림길, 특성 강화)</li>
+          <li>서버 구축과 운영: Docker Compose, nginx와 HTTPS, 도메인, Jenkins 자동 배포, 운영·개발 환경 분리, DB 백업</li>
+          <li>3챕터 보스 카이론의 동작과 기술 이펙트, itch 판 광장 배경과 NPC</li>
+          <li>최종 발표 자료 제작과 발표</li>
+        </ul>
+        <a href="https://github.com/StackOut-K1m/Grize/blob/main/docs/my-role.md">작업 내역 자세히 보기 →</a>
+      </div>
+      <div class="card">
+        <h3>팀</h3>
+        <dl class="facts">
+          <dt>김재원 (본인)</dt><dd>인프라, 백엔드</dd>
+          <dt>이XX</dt><dd>UI, 클라이언트</dd>
+          <dt>박XX</dt><dd>클라이언트</dd>
+          <dt>송XX</dt><dd>클라이언트</dd>
+          <dt>문XX</dt><dd>클라이언트</dd>
+          <dt>장XX</dt><dd>에셋</dd>
+          <dt>조XX</dt><dd>에셋</dd>
+        </dl>
+        <dl class="facts" style="margin-top:18px">
+          <dt>개발 기간</dt><dd>2026.10.11 ~ 11.20</dd>
+          <dt>서비스 기간</dt><dd>2026.10.30 ~ 11.27</dd>
+          <dt>사용 기술</dt><dd>Phaser 3, React, TypeScript, Spring Boot 3, MySQL 8, WebSocket, Docker, nginx, Jenkins, Prometheus, Grafana</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Grize · SSAFY 15기 자율 프로젝트 C103</p>
+    <p>게임 그림과 영상의 저작권은 팀에 있습니다. 이 페이지에는 게임 소스 코드가 들어 있지 않습니다.</p>
+    <p><a href="https://github.com/StackOut-K1m/Grize">GitHub 저장소</a> · <a href="https://jkhm.itch.io/grize">itch.io</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

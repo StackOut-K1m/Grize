@@ -42,11 +42,11 @@
 
 ## 운영 결과
 
-10월 30일에 서비스를 열고 11월 17일에 집계한 값입니다 (운영자 계정 제외).
+10월 30일에 서비스를 열고 11월 22일 18시 5분(KST)에 집계한 값입니다.
 
-| 누적 플레이 | 가입 | 원정 | 1시간 넘게 플레이한 사람 | 피드백 반영 |
-|:---:|:---:|:---:|:---:|:---:|
-| 150시간+ | 193명 | 974회 | 33명 | 49건 중 36건 |
+| 누적 플레이 시간 | 계정 | 원정 플레이 | 피드백 반영 |
+|:---:|:---:|:---:|:---:|
+| 225시간 8분 (약 9일 9시간) | 215개 | 1,401회 | 49건 중 36건 |
 
 처음 열었을 때 콘텐츠는 원정 하나였습니다. 「원정 말고 할 게 없냐」는 의견이 이어져서, 원정에 쓴 보스와 맵을 다른 모드에서 다시 쓰는 방식으로 콘텐츠를 늘렸고 운영 기간 동안 15번 업데이트했습니다.
 
@@ -106,13 +106,15 @@ flowchart LR
 
 이 저장소에는 게임을 소개하는 문서와 그림, 영상만 있고 게임 소스 코드는 없습니다. 그림과 영상의 저작권은 팀에 있습니다.
 
+같은 내용을 웹 페이지로도 정리했습니다: [소개](index.html), [게임](game.html), [기술](tech.html). 저장소를 공개하고 GitHub Pages 를 켜면 바로 열립니다.
+
 ---
 
 ## English summary
 
 **Grize** is a side-scrolling action roguelite that runs in the browser. When you defeat a boss you absorb its shadow, and from then on you can transform into that boss ("mimicry") and use its skills.
 
-- **Team project** (7 people, SSAFY, Oct–Nov 2026). The live service ran from Oct 30 to Nov 27, 2026: 193 sign-ups, 974 expeditions, over 150 hours of total play, 36 of 49 player requests shipped across 15 updates.
+- **Team project** (7 people, SSAFY, Oct–Nov 2026). The live service ran from Oct 30 to Nov 27, 2026. As of Nov 22: 215 accounts, 1,401 expeditions played, 225 hours of total play time; 36 of 49 player requests shipped across 15 updates.
 - **My part: infrastructure and backend, plus some assets.** Database design and API specs, email / Google sign-in with JWT, the first version of server-side expedition saving (checkpoints and settlement), wiring the client's expedition flow to the server, and the whole deployment: Docker Compose, nginx with TLS, Jenkins CI/CD, separate production and development stacks on one server, daily DB backups. I also made the chapter-3 boss Kairon (sprite and skill effects) and the new plaza background and NPCs for the itch.io build.
 - **Stack**: Phaser 3 + React (TypeScript) on the client; Spring Boot 3 + MySQL 8 with WebSocket rooms on the server; one shared content package (JSON validated with Zod) read by both.
 - **Notable parts**: the server keeps each run's plan and checks reported results against it (idempotent writes with revision checks); honeypot monsters and k-NN anomaly scores against forged clears; lossless WebP and split asset packs cut chapter loading from 25 s to 8 s.
