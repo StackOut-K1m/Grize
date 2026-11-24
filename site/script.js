@@ -20,7 +20,7 @@
     if (!d || !detail) return;
     nodes.forEach(function (n) { n.setAttribute('aria-pressed', n.dataset.k === k ? 'true' : 'false'); });
     detail.innerHTML = '<h3>' + d.t + '</h3><p>' + d.b + '</p><p class="note">기술: ' + d.s + '</p>' +
-      (d.mine ? '<p><span class="chip">제가 맡은 부분</span> ' + d.mine + '</p>' : '');
+      (d.mine ? '<p><span class="chip">담당 범위</span> ' + d.mine + '</p>' : '');
   }
   nodes.forEach(function (n) { n.addEventListener('click', function () { show(n.dataset.k); }); });
   if (nodes.length) show('api');

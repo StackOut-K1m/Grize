@@ -86,7 +86,7 @@ flowchart LR
 - DB 스키마와 ERD, API 공통 규약과 원정 API 명세를 작성했습니다.
 - 이메일·Google 로그인과 JWT 인증, Flyway 스키마, 서버 쪽 원정 저장(체크포인트, 정산)을 처음 구현했습니다.
 - 클라이언트의 원정 진행을 서버 저장에 연결했습니다 (상점, 유물, 의태 획득, 갈림길, 특성 강화).
-- 서버 구축과 운영을 맡았습니다. Docker Compose 설정, nginx와 HTTPS, 도메인, Jenkins 자동 배포, 운영·개발 환경 분리, DB 백업을 했습니다.
+- 서버 구축과 운영을 담당했습니다. Docker Compose 설정, nginx와 HTTPS, 도메인, Jenkins 자동 배포, 운영·개발 환경 분리, DB 백업을 했습니다.
 - 3챕터 보스 카이론의 그림과 기술 이펙트, itch 판의 새 광장 배경과 NPC를 만들었습니다.
 - 최종 발표 자료를 만들고 발표했습니다.
 
@@ -115,7 +115,7 @@ flowchart LR
 **Grize** is a side-scrolling action roguelite that runs in the browser. When you defeat a boss you absorb its shadow, and from then on you can transform into that boss ("mimicry") and use its skills.
 
 - **Team project** (7 people, SSAFY, Oct–Nov 2026). The live service ran from Oct 30 to Nov 27, 2026. As of Nov 22: 215 accounts, 1,401 expeditions played, 225 hours of total play time; 36 of 49 player requests shipped across 15 updates.
-- **My part: infrastructure and backend, plus some assets.** Database design and API specs, email / Google sign-in with JWT, the first version of server-side expedition saving (checkpoints and settlement), wiring the client's expedition flow to the server, and the whole deployment: Docker Compose, nginx with TLS, Jenkins CI/CD, separate production and development stacks on one server, daily DB backups. I also made the chapter-3 boss Kairon (sprite and skill effects) and the new plaza background and NPCs for the itch.io build.
+- **Role: infrastructure and backend, plus some assets.** Database design and API specs, email / Google sign-in with JWT, the first version of server-side expedition saving (checkpoints and settlement), wiring the client's expedition flow to the server, and the whole deployment: Docker Compose, nginx with TLS, Jenkins CI/CD, separate production and development stacks on one server, daily DB backups. Also produced the chapter-3 boss Kairon (sprite and skill effects) and the new plaza background and NPCs for the itch.io build.
 - **Stack**: Phaser 3 + React (TypeScript) on the client; Spring Boot 3 + MySQL 8 with WebSocket rooms on the server; one shared content package (JSON validated with Zod) read by both.
 - **Notable parts**: the server keeps each run's plan and checks reported results against it (idempotent writes with revision checks); honeypot monsters and k-NN anomaly scores against forged clears; lossless WebP and split asset packs cut chapter loading from 25 s to 8 s.
 - **Play** the single-player build on [itch.io](https://jkhm.itch.io/grize). It needs no server.

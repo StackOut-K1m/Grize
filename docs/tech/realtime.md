@@ -2,7 +2,7 @@
 
 [← README](../../README.md) · [기술 구조](architecture.md) · [서버 권위 원정과 보안](server-authority.md) · [인프라와 배포](infra.md) · [트러블슈팅](troubleshooting.md) · [예상 질문](qna.md)
 
-> 실시간 서버와 멀티 콘텐츠는 주로 팀원(이XX 등)이 구현했습니다. 저는 그 아래의 인증, 배포, nginx 의 WebSocket 경로를 맡았습니다.
+> 실시간 서버와 멀티 콘텐츠는 팀원(이XX 등)이 주로 구현했고, 그 아래의 인증과 배포, nginx 의 WebSocket 경로를 담당했습니다.
 
 멀티 콘텐츠는 API 서버 안의 WebSocket 연결 하나에 방 종류를 나눠 올렸습니다. 콘텐츠마다 공정성이 얼마나 중요한지에 따라 동기화 방식을 다르게 골랐습니다.
 
